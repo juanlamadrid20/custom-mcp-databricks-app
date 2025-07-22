@@ -1,1 +1,0 @@
-"""MCP App Proxy package for Databricks Apps."""
