@@ -20,46 +20,12 @@ import subprocess
 import sys
 
 import requests
-from databricks.sdk import WorkspaceClient
-from dotenv import load_dotenv
-
-# Note: We no longer load from .env.local or environment variables
-# DATABRICKS_HOST is now passed as a command line argument
-
-
-def get_workspace_client():
-  """Get Databricks WorkspaceClient using environment variables."""
-  return WorkspaceClient()
-
-
-def get_databricks_app_url():
-  """Get the Databricks App URL from environment or SDK."""
-  try:
-    # First check environment variable
-    app_url = os.environ.get('DATABRICKS_APP_URL')
-    if app_url:
-      return app_url
-
-    # Otherwise get from SDK
-    w = get_workspace_client()
-    apps = list(w.apps.list())
-
-    for app in apps:
-      if app.name == 'mcp-commands':
-        return app.url + '/mcp/sse/'  # Add MCP SSE endpoint path
-
-    raise Exception("App 'mcp-commands' not found in apps list")
-  except Exception as e:
-    raise Exception(f'Failed to get Databricks App URL: {e}')
 
 
 def get_oauth_token(databricks_host):
   """Get OAuth token from Databricks CLI."""
   try:
-    # Use SDK to get current user's token
-    get_workspace_client()
-    # The SDK handles authentication internally
-    # For OAuth, we need to get the token from the underlying client
+    # Get token directly from Databricks CLI
     result = subprocess.run(
       ['databricks', 'auth', 'token', '--host', databricks_host],
       capture_output=True,

@@ -50,13 +50,9 @@ Think of it as a bridge between Claude and your Databricks workspace - you defin
 Since this repo is public, you can use it directly:
 
 ```bash
-# Add this MCP server to Claude
-claude mcp add databricks-mcp \
-  uvx \
-  --from git+ssh://git@github.com/databricks-solutions/custom-mcp-databricks-app.git \
-  dba-mcp-proxy \
-  --databricks-host https://your-workspace.cloud.databricks.com \
-  --databricks-app-url https://your-app.databricksapps.com
+# Add this MCP server to Claude (user-scoped)
+claude mcp add --scope user databricks-mcp \
+  "uvx --from git+ssh://git@github.com/databricks-solutions/custom-mcp-databricks-app.git dba-mcp-proxy --databricks-host https://your-workspace.cloud.databricks.com --databricks-app-url https://your-app.databricksapps.com"
 ```
 
 ### Or Use Your Own Fork
@@ -68,12 +64,8 @@ claude mcp add databricks-mcp \
 
 ```bash
 # Using your fork
-claude mcp add my-databricks-mcp \
-  uvx \
-  --from git+ssh://git@github.com/YOUR-ORG/YOUR-REPO.git \
-  dba-mcp-proxy \
-  --databricks-host https://your-workspace.cloud.databricks.com \
-  --databricks-app-url https://your-app.databricksapps.com
+claude mcp add --scope user my-databricks-mcp \
+  "uvx --from git+ssh://git@github.com/YOUR-ORG/YOUR-REPO.git dba-mcp-proxy --databricks-host https://your-workspace.cloud.databricks.com --databricks-app-url https://your-app.databricksapps.com"
 ```
 
 ### Local Development
@@ -88,12 +80,8 @@ cd <your-repo>
 ./watch.sh
 
 # Add to Claude for local testing
-claude mcp add databricks-mcp-local \
-  uvx \
-  --from git+ssh://git@github.com/YOUR-ORG/YOUR-REPO.git \
-  dba-mcp-proxy \
-  --databricks-host https://your-workspace.cloud.databricks.com \
-  --databricks-app-url http://localhost:8000
+claude mcp add --scope local databricks-mcp-local \
+  "uvx --from git+ssh://git@github.com/YOUR-ORG/YOUR-REPO.git dba-mcp-proxy --databricks-host https://your-workspace.cloud.databricks.com --databricks-app-url http://localhost:8000"
 ```
 
 ## Customization Guide
@@ -248,11 +236,27 @@ def create_job(name: str, notebook_path: str, cluster_id: str) -> dict:
     return {"job_id": job.job_id, "run_now_url": f"{DATABRICKS_HOST}/#job/{job.job_id}"}
 ```
 
+## Testing Your MCP Server
+
+After adding the MCP server to Claude, verify it's working:
+
+```bash
+# List available prompts and tools
+echo "What MCP prompts are available from databricks-mcp?" | claude
+
+# Test a specific prompt
+echo "Use the check_system prompt from databricks-mcp" | claude
+```
+
 ## Troubleshooting
 
 - **Authentication errors**: Run `databricks auth login` to refresh credentials
 - **MCP not found**: Ensure the app is deployed and accessible
 - **Tool errors**: Check logs at `https://your-app.databricksapps.com/logz`
+- **MCP connection issues**: 
+  - Check Claude logs: `tail -f ~/Library/Logs/Claude/*.log`
+  - Verify the proxy works: `uvx --from git+ssh://... dba-mcp-proxy --help`
+  - Test with echo pipe: `echo "list your mcp commands" | claude`
 
 ## Contributing
 

@@ -284,4 +284,20 @@ Claude understands natural language commands for common development tasks:
 - Client proxy (`mcp_databricks_client.py`) connects to deployed app or local server
 - OAuth authentication handled automatically for deployed apps
 
+### Testing MCP Servers
+When testing MCP server connections, use this trick:
+```bash
+# Check if MCP server is connected and list available commands
+echo "list your mcp commands" | claude
+
+# Check specific MCP server prompts
+echo "What MCP prompts are available from databricks-mcp?" | claude
+```
+
+If the MCP server doesn't respond:
+1. Check Claude logs: `tail -f ~/Library/Logs/Claude/*.log`
+2. Check MCP logs in cache directory
+3. Verify the proxy command works standalone
+4. Ensure the app is deployed and accessible
+
 Remember: This is a development template focused on rapid iteration and modern tooling.
