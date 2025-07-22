@@ -16,21 +16,34 @@ I'll help you set up your own Databricks MCP (Model Context Protocol) server so 
 
 ---
 
-## Step 0: Check Existing MCP Configuration
+## Step 0: Check Configuration and Existing MCP Setup
 
-**Let me first check if your MCP server is already set up:**
+**First, let me check your MCP server configuration:**
+
+[I'll read config.yaml to get your server name]
+
+```yaml
+# config.yaml
+servername: [your-server-name]  # Default is 'databricks-mcp'
+```
+
+**Now let me check if your MCP server is already set up:**
 
 ```bash
 # Check if MCP server is already added to Claude
-echo "list your mcp servers" | claude | grep -q "databricks-mcp" && echo "✅ MCP server already configured!" || echo "❌ MCP server not found"
+SERVER_NAME="[server-name-from-config]"
+echo "list your mcp servers" | claude | grep -q "$SERVER_NAME" && echo "✅ MCP server '$SERVER_NAME' already configured!" || echo "❌ MCP server '$SERVER_NAME' not found"
 ```
 
-[I'll run this check first]
+[I'll run this check with the actual server name]
 
-**If the MCP server is already configured:**
+**If the MCP server is already configured AND .env.local exists:**
 - ✅ Great! Let's skip to Step 4 to test it's working properly
 - 🔄 Want to redeploy with changes? Continue with Step 2
-- 🆕 Want to start fresh? Remove it first with: `claude mcp remove databricks-mcp`
+- 🆕 Want to start fresh? Remove it first with: `claude mcp remove $SERVER_NAME`
+
+**If .env.local doesn't exist:**
+- 🆕 This looks like a fresh clone - let's start from Step 1!
 
 ---
 
@@ -92,7 +105,7 @@ export DATABRICKS_HOST="[your-workspace-from-env]"
 export DATABRICKS_APP_URL="[your-app-url-from-status]"
 
 # Add MCP server to Claude
-claude mcp add databricks-mcp --scope user -- \
+claude mcp add $SERVER_NAME --scope user -- \
   uvx --from git+ssh://git@github.com/databricks-solutions/custom-mcp-databricks-app.git \
   dba-mcp-proxy \
   --databricks-host $DATABRICKS_HOST \

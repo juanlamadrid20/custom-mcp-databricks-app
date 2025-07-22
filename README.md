@@ -45,30 +45,7 @@ Think of it as a bridge between Claude and your Databricks workspace - you defin
 
 ## Quick Start
 
-### Option 1: Use the Deployed MCP Server
-
-Since this repo is public, you can use it directly:
-
-```bash
-# Set your Databricks configuration
-export DATABRICKS_HOST="https://your-workspace.cloud.databricks.com"
-export DATABRICKS_APP_URL="https://your-app.databricksapps.com"  # Get this from ./app_status.sh
-
-# Add this MCP server to Claude (user-scoped)
-claude mcp add databricks-mcp --scope user -- \
-  uvx --from git+ssh://git@github.com/databricks-solutions/custom-mcp-databricks-app.git dba-mcp-proxy \
-  --databricks-host $DATABRICKS_HOST \
-  --databricks-app-url $DATABRICKS_APP_URL
-```
-
-> **Note**: You can also use HTTPS instead of SSH if you prefer:
-> ```bash
-> uvx --from https://github.com/databricks-solutions/custom-mcp-databricks-app.git dba-mcp-proxy \
->   --databricks-host $DATABRICKS_HOST \
->   --databricks-app-url $DATABRICKS_APP_URL
-> ```
-
-### Option 2: Create Your Own MCP Server
+### Create Your Own MCP Server
 
 #### Step 1: Use this template
 
@@ -109,6 +86,23 @@ This will:
 - Show you available prompts and tools
 
 Then restart Claude Code to use your new MCP server.
+
+### Add to Claude CLI
+
+After deployment, add your MCP server to Claude:
+
+```bash
+# Set your Databricks configuration
+export DATABRICKS_HOST="https://your-workspace.cloud.databricks.com"
+export DATABRICKS_APP_URL="https://your-app.databricksapps.com"  # Get this from ./app_status.sh
+export SERVER_NAME="your-server-name"  # This comes from config.yaml (set during ./setup.sh)
+
+# Add your MCP server to Claude (user-scoped)
+claude mcp add $SERVER_NAME --scope user -- \
+  uvx --from git+ssh://git@github.com/YOUR-USERNAME/your-repo.git dba-mcp-proxy \
+  --databricks-host $DATABRICKS_HOST \
+  --databricks-app-url $DATABRICKS_APP_URL
+```
 
 ### Local Development
 
