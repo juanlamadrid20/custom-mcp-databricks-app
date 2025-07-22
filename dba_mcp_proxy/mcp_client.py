@@ -5,9 +5,10 @@ This implements the MCP protocol directly to create a true transparent proxy
 that forwards all requests to the remote Databricks App MCP server.
 
 Usage:
-    mcp_databricks_client.py <URL>
+    mcp_databricks_client.py <DATABRICKS_HOST> <APP_URL>
 
-    URL must be provided:
+    DATABRICKS_HOST: Your Databricks workspace URL (e.g., https://workspace.cloud.databricks.com)
+    APP_URL: The Databricks App URL
     - Full URL like http://localhost:8000/mcp/sse/
     - Or base URL like https://app.databricksapps.com (will append /mcp/sse/)
 """
@@ -21,13 +22,8 @@ import requests
 from databricks.sdk import WorkspaceClient
 from dotenv import load_dotenv
 
-# Load environment variables from .env.local
-load_dotenv('.env.local')
-
-# Databricks configuration
-DATABRICKS_HOST = os.environ.get(
-  'DATABRICKS_HOST', 'https://eng-ml-inference-team-us-west-2.cloud.databricks.com'
-)
+# Note: We no longer load from .env.local or environment variables
+# DATABRICKS_HOST is now passed as a command line argument
 
 
 def get_workspace_client():
@@ -56,7 +52,7 @@ def get_databricks_app_url():
     raise Exception(f'Failed to get Databricks App URL: {e}')
 
 
-def get_oauth_token():
+def get_oauth_token(databricks_host):
   """Get OAuth token from Databricks CLI."""
   try:
     # Use SDK to get current user's token
@@ -64,7 +60,7 @@ def get_oauth_token():
     # The SDK handles authentication internally
     # For OAuth, we need to get the token from the underlying client
     result = subprocess.run(
-      ['databricks', 'auth', 'token', '--host', DATABRICKS_HOST],
+      ['databricks', 'auth', 'token', '--host', databricks_host],
       capture_output=True,
       text=True,
       check=True,
@@ -77,9 +73,12 @@ def get_oauth_token():
 class MCPProxy:
   """Pure MCP Protocol Proxy."""
 
-  def __init__(self, url):
+  def __init__(self, databricks_host, url):
     if not url:
       raise ValueError('URL argument is required')
+
+    # Store databricks_host for OAuth token retrieval
+    self.databricks_host = databricks_host
 
     # Ensure URL ends with /mcp/ for the MCP endpoint
     if not url.endswith('/mcp/'):
@@ -103,7 +102,7 @@ class MCPProxy:
     if self.is_local:
       oauth_token = 'local-test-token'
     else:
-      oauth_token = get_oauth_token()
+      oauth_token = get_oauth_token(self.databricks_host)
 
     headers = {
       'Authorization': f'Bearer {oauth_token}',
@@ -224,17 +223,22 @@ class MCPProxy:
 def main():
   """Main entry point for the MCP proxy."""
   try:
-    # Get URL from command line argument
-    if len(sys.argv) < 2:
-      print(f'Usage: {sys.argv[0]} <URL>', file=sys.stderr)
-      print('URL examples:', file=sys.stderr)
+    # Get arguments from command line
+    if len(sys.argv) < 3:
+      print(f'Usage: {sys.argv[0]} <DATABRICKS_HOST> <APP_URL>', file=sys.stderr)
+      print('', file=sys.stderr)
+      print('DATABRICKS_HOST: Your Databricks workspace URL', file=sys.stderr)
+      print('  - https://workspace.cloud.databricks.com', file=sys.stderr)
+      print('', file=sys.stderr)
+      print('APP_URL examples:', file=sys.stderr)
       print('  - http://localhost:8000/mcp/sse/', file=sys.stderr)
       print('  - http://localhost:8000', file=sys.stderr)
       print('  - https://myapp.databricksapps.com', file=sys.stderr)
       sys.exit(1)
 
-    url = sys.argv[1]
-    proxy = MCPProxy(url)
+    databricks_host = sys.argv[1]
+    url = sys.argv[2]
+    proxy = MCPProxy(databricks_host, url)
     print(f'Connected to MCP server at: {proxy.app_url}', file=sys.stderr)
     proxy.run()
   except Exception as e:
