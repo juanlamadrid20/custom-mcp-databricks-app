@@ -51,8 +51,10 @@ Since this repo is public, you can use it directly:
 
 ```bash
 # Add this MCP server to Claude (user-scoped)
-claude mcp add --scope user databricks-mcp \
-  "uvx --from git+ssh://git@github.com/databricks-solutions/custom-mcp-databricks-app.git dba-mcp-proxy --databricks-host https://your-workspace.cloud.databricks.com --databricks-app-url https://your-app.databricksapps.com"
+claude mcp add databricks-mcp --scope user -- \
+  uvx --from git+ssh://git@github.com/databricks-solutions/custom-mcp-databricks-app.git \
+  dba-mcp-proxy --databricks-host https://your-workspace.cloud.databricks.com \
+  --databricks-app-url https://your-app.databricksapps.com
 ```
 
 ### Or Use Your Own Fork
@@ -64,8 +66,10 @@ claude mcp add --scope user databricks-mcp \
 
 ```bash
 # Using your fork
-claude mcp add --scope user my-databricks-mcp \
-  "uvx --from git+ssh://git@github.com/YOUR-ORG/YOUR-REPO.git dba-mcp-proxy --databricks-host https://your-workspace.cloud.databricks.com --databricks-app-url https://your-app.databricksapps.com"
+claude mcp add my-databricks-mcp --scope user -- \
+  uvx --from git+ssh://git@github.com/YOUR-ORG/YOUR-REPO.git \
+  dba-mcp-proxy --databricks-host https://your-workspace.cloud.databricks.com \
+  --databricks-app-url https://your-app.databricksapps.com
 ```
 
 ### Local Development
@@ -80,8 +84,10 @@ cd <your-repo>
 ./watch.sh
 
 # Add to Claude for local testing
-claude mcp add --scope local databricks-mcp-local \
-  "uvx --from git+ssh://git@github.com/YOUR-ORG/YOUR-REPO.git dba-mcp-proxy --databricks-host https://your-workspace.cloud.databricks.com --databricks-app-url http://localhost:8000"
+claude mcp add databricks-mcp-local --scope local -- \
+  uvx --from git+ssh://git@github.com/YOUR-ORG/YOUR-REPO.git \
+  dba-mcp-proxy --databricks-host https://your-workspace.cloud.databricks.com \
+  --databricks-app-url http://localhost:8000
 ```
 
 ## Customization Guide
