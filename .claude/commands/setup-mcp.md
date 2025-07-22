@@ -75,13 +75,24 @@ fi
 
 ```bash
 # Open a new terminal for interactive setup
+CURRENT_DIR=$(pwd)
 if [ -d "/Applications/iTerm.app" ]; then
-    osascript -e 'tell application "iTerm" to create window with default profile' \
-              -e 'tell application "iTerm" to tell current session of current window to write text "cd '"$(pwd)"' && ./setup.sh --auto-close"' \
-              -e 'tell application "iTerm" to activate'
+    osascript <<EOF
+tell application "iTerm"
+    create window with default profile
+    tell current session of current window
+        write text "cd $CURRENT_DIR && ./setup.sh --auto-close"
+    end tell
+    activate
+end tell
+EOF
 else
-    osascript -e 'tell application "Terminal" to do script "cd '"$(pwd)"' && ./setup.sh --auto-close"' \
-              -e 'tell application "Terminal" to activate'
+    osascript <<EOF
+tell application "Terminal"
+    do script "cd $CURRENT_DIR && ./setup.sh --auto-close"
+    activate
+end tell
+EOF
 fi
 ```
 

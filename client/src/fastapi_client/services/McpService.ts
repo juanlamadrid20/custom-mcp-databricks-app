@@ -54,4 +54,31 @@ export class McpService {
             url: '/api/mcp_info/config',
         });
     }
+    /**
+     * Get Mcp Prompt Content
+     * Get the content of a specific MCP prompt.
+     *
+     * Args:
+     * prompt_name: The name of the prompt
+     *
+     * Returns:
+     * Dictionary with prompt name and content
+     * @param promptName
+     * @returns string Successful Response
+     * @throws ApiError
+     */
+    public static getMcpPromptContentApiMcpInfoPromptPromptNameGet(
+        promptName: string,
+    ): CancelablePromise<Record<string, string>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/mcp_info/prompt/{prompt_name}',
+            path: {
+                'prompt_name': promptName,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
 }

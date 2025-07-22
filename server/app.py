@@ -31,6 +31,7 @@ def load_env_file(filepath: str) -> None:
 load_env_file('.env')
 load_env_file('.env.local')
 
+
 # Load configuration from config.yaml
 def load_config() -> dict:
   """Load configuration from config.yaml."""
@@ -39,6 +40,7 @@ def load_config() -> dict:
     with open(config_path, 'r') as f:
       return yaml.safe_load(f)
   return {}
+
 
 config = load_config()
 servername = config.get('servername', 'databricks-mcp')

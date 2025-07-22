@@ -6,7 +6,7 @@ import os
 
 def load_prompts(mcp_server):
   """Dynamically load prompts from the prompts directory.
-  
+
   Args:
       mcp_server: The FastMCP server instance to register prompts with
   """

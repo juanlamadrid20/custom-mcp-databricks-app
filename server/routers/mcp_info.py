@@ -50,7 +50,8 @@ async def get_mcp_discovery() -> Dict[str, Any]:
   Returns:
       Dictionary with prompts and tools lists and servername
   """
-  from server.app import mcp_server as mcp, servername
+  from server.app import mcp_server as mcp
+  from server.app import servername
 
   prompts_list = []
   tools_list = []
@@ -80,23 +81,46 @@ async def get_mcp_discovery() -> Dict[str, Any]:
 @router.get('/config')
 async def get_mcp_config() -> Dict[str, Any]:
   """Get MCP configuration for Claude Code setup.
-  
+
   Returns:
       Dictionary with configuration needed for Claude MCP setup
   """
   from server.app import servername
-  
+
   # Get environment variables
   databricks_host = os.environ.get('DATABRICKS_HOST', '')
   is_databricks_app = os.environ.get('DATABRICKS_APP_PORT') is not None
-  
+
   # Get the base directory for client path
   base_dir = Path(__file__).parent.parent.parent
   client_path = str(base_dir / 'mcp_databricks_client.py')
-  
+
   return {
     'servername': servername,
     'databricks_host': databricks_host,
     'is_databricks_app': is_databricks_app,
-    'client_path': client_path
+    'client_path': client_path,
   }
+
+
+@router.get('/prompt/{prompt_name}')
+async def get_mcp_prompt_content(prompt_name: str) -> Dict[str, str]:
+  """Get the content of a specific MCP prompt.
+
+  Args:
+      prompt_name: The name of the prompt
+
+  Returns:
+      Dictionary with prompt name and content
+  """
+  prompt_file = Path(f'prompts/{prompt_name}.md')
+
+  if not prompt_file.exists():
+    from fastapi import HTTPException
+
+    raise HTTPException(status_code=404, detail=f"Prompt '{prompt_name}' not found")
+
+  with open(prompt_file, 'r') as f:
+    content = f.read()
+
+  return {'name': prompt_name, 'content': content}

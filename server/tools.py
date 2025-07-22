@@ -7,7 +7,7 @@ from databricks.sdk import WorkspaceClient
 
 def load_tools(mcp_server):
   """Register all MCP tools with the server.
-  
+
   Args:
       mcp_server: The FastMCP server instance to register tools with
   """
@@ -116,7 +116,9 @@ def load_tools(mcp_server):
             'size': warehouse.cluster_size,
             'type': warehouse.warehouse_type.value if warehouse.warehouse_type else 'UNKNOWN',
             'creator': warehouse.creator_name if hasattr(warehouse, 'creator_name') else None,
-            'auto_stop_mins': warehouse.auto_stop_mins if hasattr(warehouse, 'auto_stop_mins') else None,
+            'auto_stop_mins': warehouse.auto_stop_mins
+            if hasattr(warehouse, 'auto_stop_mins')
+            else None,
           }
         )
 
