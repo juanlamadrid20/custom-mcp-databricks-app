@@ -57,6 +57,18 @@ claude mcp add databricks-mcp --scope user -- \
   --databricks-app-url https://your-app.databricksapps.com
 ```
 
+Or for better readability, use the multi-line format:
+
+```bash
+# Add with full paths (recommended for clarity)
+claude mcp add databricks-mcp --scope user -- \
+  /opt/homebrew/bin/uvx \
+  --from git+ssh://git@github.com/databricks-solutions/custom-mcp-databricks-app.git \
+  dba-mcp-proxy \
+  --databricks-host https://your-workspace.cloud.databricks.com \
+  --databricks-app-url https://your-app.databricksapps.com
+```
+
 ### Or Use Your Own Fork
 
 1. Fork this repository
