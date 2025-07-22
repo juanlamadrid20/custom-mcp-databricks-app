@@ -16,6 +16,24 @@ I'll help you set up your own Databricks MCP (Model Context Protocol) server so 
 
 ---
 
+## Step 0: Check Existing MCP Configuration
+
+**Let me first check if your MCP server is already set up:**
+
+```bash
+# Check if MCP server is already added to Claude
+echo "list your mcp servers" | claude | grep -q "databricks-mcp" && echo "✅ MCP server already configured!" || echo "❌ MCP server not found"
+```
+
+[I'll run this check first]
+
+**If the MCP server is already configured:**
+- ✅ Great! Let's skip to Step 4 to test it's working properly
+- 🔄 Want to redeploy with changes? Continue with Step 2
+- 🆕 Want to start fresh? Remove it first with: `claude mcp remove databricks-mcp`
+
+---
+
 ## Step 1: Environment Setup
 
 **Let me check if your environment is already configured:**
