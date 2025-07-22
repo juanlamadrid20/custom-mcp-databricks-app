@@ -38,9 +38,16 @@ echo "list your mcp servers" | claude | grep -q "$SERVER_NAME" && echo "✅ MCP 
 [I'll run this check with the actual server name]
 
 **If the MCP server is already configured AND .env.local exists:**
-- ✅ Great! Let's skip to Step 4 to test it's working properly
-- 🔄 Want to redeploy with changes? Continue with Step 2
-- 🆕 Want to start fresh? Remove it first with: `claude mcp remove $SERVER_NAME`
+
+✅ Your MCP server '$SERVER_NAME' is already set up! What would you like to do?
+
+1. **Skip to customization** - Jump to Step 5 to add custom prompts and tools
+2. **Test the connection** - Go to Step 4 to verify everything works
+3. **Redeploy with changes** - Continue with Step 2 to update deployment
+4. **Start fresh** - Remove and reinstall: `claude mcp remove $SERVER_NAME`
+5. **Continue from the beginning** - Go through all steps
+
+**Please let me know which option you'd prefer!**
 
 **If .env.local doesn't exist:**
 - 🆕 This looks like a fresh clone - let's start from Step 1!
@@ -51,25 +58,42 @@ echo "list your mcp servers" | claude | grep -q "$SERVER_NAME" && echo "✅ MCP 
 
 **Let me check if your environment is already configured:**
 
-[I'll check for .env.local and test Databricks authentication]
-
-**If setup is needed, I'll run the interactive setup script:**
+[I'll check for .env.local file existence]
 
 ```bash
-# I'll open a new terminal for interactive setup
-./setup.sh --auto-close
+# Check if .env.local exists
+if [ -f ".env.local" ]; then
+    echo "✅ Great! .env.local found - environment is already configured"
+    # Test authentication
+    source .env.local && export DATABRICKS_HOST && export DATABRICKS_TOKEN && databricks current-user me
+else
+    echo "📋 Starting fresh - let's create your .env.local with setup"
+fi
 ```
 
-This will guide you through:
-- Databricks authentication (PAT or OAuth)
-- Workspace configuration
-- Dependency installation
+**If .env.local doesn't exist, I'll run the interactive setup script:**
+
+```bash
+# Open a new terminal for interactive setup
+if [ -d "/Applications/iTerm.app" ]; then
+    osascript -e 'tell application "iTerm" to create window with default profile' \
+              -e 'tell application "iTerm" to tell current session of current window to write text "cd '"$(pwd)"' && ./setup.sh --auto-close"' \
+              -e 'tell application "iTerm" to activate'
+else
+    osascript -e 'tell application "Terminal" to do script "cd '"$(pwd)"' && ./setup.sh --auto-close"' \
+              -e 'tell application "Terminal" to activate'
+fi
+```
+
+[I'll wait for you to complete the setup and say "done" when you're ready to continue]
+
+**Please say "done" when the setup script completes!**
 
 ---
 
 ## Step 2: Deploy MCP Server
 
-**Once setup is complete, I'll deploy your MCP server:**
+**After you've said "done", I'll deploy your MCP server:**
 
 **a) Check if app exists:**
 [I'll run `./app_status.sh` to check current status]
@@ -81,28 +105,57 @@ nohup ./deploy.sh --create --verbose > /tmp/mcp-deploy.log 2>&1 &
 ```
 
 **c) Monitor deployment:**
-[I'll tail the log file and wait for completion]
+[I'll tail the log file and monitor progress]
 
-**d) Get your app URL:**
-[I'll run `./app_status.sh` to get the deployed URL]
+```bash
+# Monitor deployment log
+tail -f /tmp/mcp-deploy.log
+```
 
-**Your MCP Server Details:**
-- **Workspace:** [DATABRICKS_HOST from .env.local]
-- **App Name:** [DATABRICKS_APP_NAME from .env.local]
-- **App URL:** [URL from app_status.sh]
+**d) Wait for app to be fully ready:**
+[I'll keep checking app status until it's RUNNING]
+
+```bash
+# Keep checking until app is ready
+while true; do
+    STATUS=$(./app_status.sh | grep "App Status:" | awk '{print $NF}')
+    if [ "$STATUS" = "RUNNING" ]; then
+        echo "✅ App is now RUNNING!"
+        break
+    else
+        echo "⏳ App status: $STATUS - waiting..."
+        sleep 10
+    fi
+done
+```
+
+**e) Get your app URL:**
+[Once the app is RUNNING, I'll show you the deployed app]
+
+```bash
+# Get and display app URL
+export DATABRICKS_APP_URL=$(./app_status.sh | grep "App URL" | awk '{print $NF}')
+echo "
+✅ Your MCP server is deployed!
+🌐 App URL: $DATABRICKS_APP_URL
+🔗 You can visit your app at: $DATABRICKS_APP_URL
+"
+```
 
 ---
 
 ## Step 3: Add MCP Server to Claude
 
+**Only after the app is fully deployed and RUNNING, we'll add it to Claude:**
+
 **Now let's add your MCP server to Claude!**
 
-Based on your deployment, here's your personalized command:
+[I'll read the configuration from .env.local and app_status.sh]
 
 ```bash
-# Set your configuration
-export DATABRICKS_HOST="[your-workspace-from-env]"
-export DATABRICKS_APP_URL="[your-app-url-from-status]"
+# Get configuration
+source .env.local
+export DATABRICKS_APP_URL=$(./app_status.sh | grep "App URL" | awk '{print $NF}')
 
 # Add MCP server to Claude
 claude mcp add $SERVER_NAME --scope user -- \
@@ -112,13 +165,7 @@ claude mcp add $SERVER_NAME --scope user -- \
   --databricks-app-url $DATABRICKS_APP_URL
 ```
 
-**Would you like me to run this command for you?** 
-
-I have all the information needed:
-- Databricks Host: [from .env.local]
-- App URL: [from app_status.sh]
-
-[If yes, I'll execute the claude mcp add command with the actual values]
+[I'll execute this command with your actual values]
 
 ---
 
@@ -141,9 +188,25 @@ echo "What MCP prompts are available from databricks-mcp?" | claude
 
 ---
 
-## Step 5: Customize (Optional)
+## 🎉 Success!
 
-**Your MCP server is now live! Want to add custom functionality?**
+**Your Databricks MCP server is successfully deployed!**
+
+🔄 **Important:** Please restart Claude to see your MCP server in the `/mcp` list.
+
+**Would you like to work on adding custom tools or prompts?**
+
+I can help you:
+- 🛠️ Add custom tools for specific Databricks operations
+- 📝 Create custom prompts for your workflows
+- 🚀 Both tools and prompts
+- ✅ No thanks, I'm all set!
+
+**What would you like to do?**
+
+---
+
+## Step 5: Customize (Optional)
 
 ### Add Custom Prompts
 
@@ -168,20 +231,4 @@ def my_custom_tool(param: str) -> dict:
     return {"result": "data"}
 ```
 
-**Would you like me to:**
-1. ✨ Add a custom prompt for your use case?
-2. 🛠️ Create a custom tool for specific Databricks operations?
-3. 📚 Show you more examples of what's possible?
-4. ✅ Leave it as is - you're all set!
-
----
-
-## 🎉 Success!
-
-Your Databricks MCP server is deployed and connected to Claude. You can now:
-- Use prompts like `check_system` to verify connectivity
-- Execute SQL queries with proper parameterization
-- Browse DBFS files
-- Add your own custom prompts and tools
-
-**Remember:** Restart Claude or open a new session to see your MCP server in the `/mcp` list!
+[Details on how to add custom prompts and tools will be shown based on your choice above]
