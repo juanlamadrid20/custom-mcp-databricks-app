@@ -5,14 +5,15 @@ This implements the MCP protocol directly to create a true transparent proxy
 that forwards all requests to the remote Databricks App MCP server.
 
 Usage:
-    mcp_databricks_client.py <DATABRICKS_HOST> <APP_URL>
+    mcp_databricks_client.py --databricks-host <HOST> --databricks-app-url <URL>
 
-    DATABRICKS_HOST: Your Databricks workspace URL (e.g., https://workspace.cloud.databricks.com)
-    APP_URL: The Databricks App URL
+    --databricks-host: Your Databricks workspace URL (e.g., https://workspace.cloud.databricks.com)
+    --databricks-app-url: The Databricks App URL
     - Full URL like http://localhost:8000/mcp/sse/
     - Or base URL like https://app.databricksapps.com (will append /mcp/sse/)
 """
 
+import argparse
 import json
 import os
 import subprocess
@@ -222,23 +223,35 @@ class MCPProxy:
 
 def main():
   """Main entry point for the MCP proxy."""
-  try:
-    # Get arguments from command line
-    if len(sys.argv) < 3:
-      print(f'Usage: {sys.argv[0]} <DATABRICKS_HOST> <APP_URL>', file=sys.stderr)
-      print('', file=sys.stderr)
-      print('DATABRICKS_HOST: Your Databricks workspace URL', file=sys.stderr)
-      print('  - https://workspace.cloud.databricks.com', file=sys.stderr)
-      print('', file=sys.stderr)
-      print('APP_URL examples:', file=sys.stderr)
-      print('  - http://localhost:8000/mcp/sse/', file=sys.stderr)
-      print('  - http://localhost:8000', file=sys.stderr)
-      print('  - https://myapp.databricksapps.com', file=sys.stderr)
-      sys.exit(1)
+  parser = argparse.ArgumentParser(
+    description='MCP Proxy for Databricks Apps',
+    formatter_class=argparse.RawDescriptionHelpFormatter,
+    epilog='''
+Examples:
+  # Connect to local development server
+  %(prog)s --databricks-host https://workspace.cloud.databricks.com --databricks-app-url http://localhost:8000
 
-    databricks_host = sys.argv[1]
-    url = sys.argv[2]
-    proxy = MCPProxy(databricks_host, url)
+  # Connect to deployed Databricks App
+  %(prog)s --databricks-host https://workspace.cloud.databricks.com --databricks-app-url https://myapp.databricksapps.com
+    '''
+  )
+  
+  parser.add_argument(
+    '--databricks-host',
+    required=True,
+    help='Your Databricks workspace URL (e.g., https://workspace.cloud.databricks.com)'
+  )
+  
+  parser.add_argument(
+    '--databricks-app-url',
+    required=True,
+    help='The Databricks App URL (e.g., https://myapp.databricksapps.com)'
+  )
+  
+  args = parser.parse_args()
+  
+  try:
+    proxy = MCPProxy(args.databricks_host, args.databricks_app_url)
     print(f'Connected to MCP server at: {proxy.app_url}', file=sys.stderr)
     proxy.run()
   except Exception as e:

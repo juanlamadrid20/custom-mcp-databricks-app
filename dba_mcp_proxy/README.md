@@ -7,13 +7,16 @@ A Model Context Protocol (MCP) proxy client for Databricks Apps.
 Run the proxy directly from GitHub using uvx:
 
 ```bash
-uvx --from git+ssh://git@github.com/databricks-solutions/custom-mcp-databricks-app.git dba-mcp-proxy <DATABRICKS_HOST> <APP_URL>
+uvx --from git+ssh://git@github.com/databricks-solutions/custom-mcp-databricks-app.git \
+  dba-mcp-proxy \
+  --databricks-host <HOST> \
+  --databricks-app-url <URL>
 ```
 
 ### Arguments
 
-- **DATABRICKS_HOST**: Your Databricks workspace URL (e.g., `https://workspace.cloud.databricks.com`)
-- **APP_URL**: The Databricks App URL (e.g., `https://myapp.databricksapps.com`)
+- **--databricks-host**: Your Databricks workspace URL (e.g., `https://workspace.cloud.databricks.com`)
+- **--databricks-app-url**: The Databricks App URL (e.g., `https://myapp.databricksapps.com`)
 
 ### Examples
 
@@ -21,14 +24,14 @@ uvx --from git+ssh://git@github.com/databricks-solutions/custom-mcp-databricks-a
 # Connect to local development server
 uvx --from git+ssh://git@github.com/databricks-solutions/custom-mcp-databricks-app.git \
   dba-mcp-proxy \
-  https://workspace.cloud.databricks.com \
-  http://localhost:8000
+  --databricks-host https://workspace.cloud.databricks.com \
+  --databricks-app-url http://localhost:8000
 
 # Connect to deployed Databricks App
 uvx --from git+ssh://git@github.com/databricks-solutions/custom-mcp-databricks-app.git \
   dba-mcp-proxy \
-  https://workspace.cloud.databricks.com \
-  https://myapp.databricksapps.com
+  --databricks-host https://workspace.cloud.databricks.com \
+  --databricks-app-url https://myapp.databricksapps.com
 ```
 
 ## What it does

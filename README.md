@@ -55,8 +55,8 @@ claude mcp add databricks-mcp \
   uvx \
   --from git+ssh://git@github.com/databricks-solutions/custom-mcp-databricks-app.git \
   dba-mcp-proxy \
-  https://your-workspace.cloud.databricks.com \
-  https://your-app.databricksapps.com
+  --databricks-host https://your-workspace.cloud.databricks.com \
+  --databricks-app-url https://your-app.databricksapps.com
 ```
 
 ### Or Use Your Own Fork
@@ -72,8 +72,8 @@ claude mcp add my-databricks-mcp \
   uvx \
   --from git+ssh://git@github.com/YOUR-ORG/YOUR-REPO.git \
   dba-mcp-proxy \
-  https://your-workspace.cloud.databricks.com \
-  https://your-app.databricksapps.com
+  --databricks-host https://your-workspace.cloud.databricks.com \
+  --databricks-app-url https://your-app.databricksapps.com
 ```
 
 ### Local Development
@@ -92,8 +92,8 @@ claude mcp add databricks-mcp-local \
   uvx \
   --from git+ssh://git@github.com/YOUR-ORG/YOUR-REPO.git \
   dba-mcp-proxy \
-  https://your-workspace.cloud.databricks.com \
-  http://localhost:8000
+  --databricks-host https://your-workspace.cloud.databricks.com \
+  --databricks-app-url http://localhost:8000
 ```
 
 ## Customization Guide
