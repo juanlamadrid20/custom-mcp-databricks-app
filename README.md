@@ -50,23 +50,31 @@ Think of it as a bridge between Claude and your Databricks workspace - you defin
 Since this repo is public, you can use it directly:
 
 ```bash
+# Set your Databricks configuration
+export DATABRICKS_HOST="https://your-workspace.cloud.databricks.com"
+export DATABRICKS_APP_URL="https://your-app.databricksapps.com"  # Get this from ./app_status.sh
+
 # Add this MCP server to Claude (user-scoped)
 claude mcp add databricks-mcp --scope user -- \
   uvx --from git+ssh://git@github.com/databricks-solutions/custom-mcp-databricks-app.git \
-  dba-mcp-proxy --databricks-host https://your-workspace.cloud.databricks.com \
-  --databricks-app-url https://your-app.databricksapps.com
+  dba-mcp-proxy --databricks-host $DATABRICKS_HOST \
+  --databricks-app-url $DATABRICKS_APP_URL
 ```
 
 Or for better readability, use the multi-line format:
 
 ```bash
+# Set your Databricks configuration
+export DATABRICKS_HOST="https://your-workspace.cloud.databricks.com"
+export DATABRICKS_APP_URL="https://your-app.databricksapps.com"  # Get this from ./app_status.sh
+
 # Add with full paths (recommended for clarity)
 claude mcp add databricks-mcp --scope user -- \
   /opt/homebrew/bin/uvx \
   --from git+ssh://git@github.com/databricks-solutions/custom-mcp-databricks-app.git \
   dba-mcp-proxy \
-  --databricks-host https://your-workspace.cloud.databricks.com \
-  --databricks-app-url https://your-app.databricksapps.com
+  --databricks-host $DATABRICKS_HOST \
+  --databricks-app-url $DATABRICKS_APP_URL
 ```
 
 ### Or Use Your Own Fork
@@ -77,11 +85,15 @@ claude mcp add databricks-mcp --scope user -- \
 4. Use your own proxy:
 
 ```bash
+# Set your configuration
+export DATABRICKS_HOST="https://your-workspace.cloud.databricks.com"
+export DATABRICKS_APP_URL="https://your-app.databricksapps.com"  # Get this from ./app_status.sh
+
 # Using your fork
 claude mcp add my-databricks-mcp --scope user -- \
   uvx --from git+ssh://git@github.com/YOUR-ORG/YOUR-REPO.git \
-  dba-mcp-proxy --databricks-host https://your-workspace.cloud.databricks.com \
-  --databricks-app-url https://your-app.databricksapps.com
+  dba-mcp-proxy --databricks-host $DATABRICKS_HOST \
+  --databricks-app-url $DATABRICKS_APP_URL
 ```
 
 ### Local Development
@@ -95,11 +107,15 @@ cd <your-repo>
 # Start dev server
 ./watch.sh
 
+# Set your configuration for local testing
+export DATABRICKS_HOST="https://your-workspace.cloud.databricks.com"
+export DATABRICKS_APP_URL="http://localhost:8000"  # Local dev server
+
 # Add to Claude for local testing
 claude mcp add databricks-mcp-local --scope local -- \
   uvx --from git+ssh://git@github.com/YOUR-ORG/YOUR-REPO.git \
-  dba-mcp-proxy --databricks-host https://your-workspace.cloud.databricks.com \
-  --databricks-app-url http://localhost:8000
+  dba-mcp-proxy --databricks-host $DATABRICKS_HOST \
+  --databricks-app-url $DATABRICKS_APP_URL
 ```
 
 ## Customization Guide
@@ -170,11 +186,13 @@ Tools must:
 # Deploy to Databricks Apps
 ./deploy.sh
 
-# Check status
+# Check status and get your app URL
 ./app_status.sh
 ```
 
 Your MCP server will be available at `https://your-app.databricksapps.com/mcp/`
+
+The `app_status.sh` script will show your deployed app URL, which you'll need for the `DATABRICKS_APP_URL` environment variable when adding the MCP server to Claude.
 
 ## Authentication
 
