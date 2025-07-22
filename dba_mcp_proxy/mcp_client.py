@@ -114,7 +114,7 @@ class MCPProxy:
       if self.is_local:
         oauth_token = 'local-test-token'
       else:
-        oauth_token = get_oauth_token()
+        oauth_token = get_oauth_token(self.databricks_host)
 
       headers = {
         'Authorization': f'Bearer {oauth_token}',
