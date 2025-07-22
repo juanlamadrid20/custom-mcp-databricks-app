@@ -15,7 +15,6 @@ Usage:
 
 import argparse
 import json
-import os
 import subprocess
 import sys
 
@@ -192,30 +191,30 @@ def main():
   parser = argparse.ArgumentParser(
     description='MCP Proxy for Databricks Apps',
     formatter_class=argparse.RawDescriptionHelpFormatter,
-    epilog='''
+    epilog="""
 Examples:
   # Connect to local development server
   %(prog)s --databricks-host https://workspace.cloud.databricks.com --databricks-app-url http://localhost:8000
 
   # Connect to deployed Databricks App
   %(prog)s --databricks-host https://workspace.cloud.databricks.com --databricks-app-url https://myapp.databricksapps.com
-    '''
+    """,
   )
-  
+
   parser.add_argument(
     '--databricks-host',
     required=True,
-    help='Your Databricks workspace URL (e.g., https://workspace.cloud.databricks.com)'
+    help='Your Databricks workspace URL (e.g., https://workspace.cloud.databricks.com)',
   )
-  
+
   parser.add_argument(
     '--databricks-app-url',
     required=True,
-    help='The Databricks App URL (e.g., https://myapp.databricksapps.com)'
+    help='The Databricks App URL (e.g., https://myapp.databricksapps.com)',
   )
-  
+
   args = parser.parse_args()
-  
+
   try:
     proxy = MCPProxy(args.databricks_host, args.databricks_app_url)
     print(f'Connected to MCP server at: {proxy.app_url}', file=sys.stderr)

@@ -93,8 +93,7 @@ def execute_dbsql(query: str, warehouse_id=None, catalog=None, schema=None, limi
       return {
         'success': False,
         'error': (
-          'No SQL warehouse ID provided. '
-          'Set DATABRICKS_SQL_WAREHOUSE_ID or pass warehouse_id.'
+          'No SQL warehouse ID provided. Set DATABRICKS_SQL_WAREHOUSE_ID or pass warehouse_id.'
         ),
       }
 
@@ -160,8 +159,6 @@ app.add_middleware(
 )
 
 app.include_router(router, prefix='/api', tags=['api'])
-
-
 
 
 # Mount the MCP server

@@ -52,7 +52,7 @@ Since this repo is public, you can use it directly:
 ```bash
 # Add this MCP server to Claude (user-scoped)
 claude mcp add --scope user databricks-mcp \
-  "sh -c 'uvx --from git+ssh://git@github.com/databricks-solutions/custom-mcp-databricks-app.git dba-mcp-proxy --databricks-host https://your-workspace.cloud.databricks.com --databricks-app-url https://your-app.databricksapps.com'"
+  "uvx --from git+ssh://git@github.com/databricks-solutions/custom-mcp-databricks-app.git dba-mcp-proxy --databricks-host https://your-workspace.cloud.databricks.com --databricks-app-url https://your-app.databricksapps.com"
 ```
 
 ### Or Use Your Own Fork
@@ -65,7 +65,7 @@ claude mcp add --scope user databricks-mcp \
 ```bash
 # Using your fork
 claude mcp add --scope user my-databricks-mcp \
-  "sh -c 'uvx --from git+ssh://git@github.com/YOUR-ORG/YOUR-REPO.git dba-mcp-proxy --databricks-host https://your-workspace.cloud.databricks.com --databricks-app-url https://your-app.databricksapps.com'"
+  "uvx --from git+ssh://git@github.com/YOUR-ORG/YOUR-REPO.git dba-mcp-proxy --databricks-host https://your-workspace.cloud.databricks.com --databricks-app-url https://your-app.databricksapps.com"
 ```
 
 ### Local Development
@@ -81,7 +81,7 @@ cd <your-repo>
 
 # Add to Claude for local testing
 claude mcp add --scope local databricks-mcp-local \
-  "sh -c 'uvx --from git+ssh://git@github.com/YOUR-ORG/YOUR-REPO.git dba-mcp-proxy --databricks-host https://your-workspace.cloud.databricks.com --databricks-app-url http://localhost:8000'"
+  "uvx --from git+ssh://git@github.com/YOUR-ORG/YOUR-REPO.git dba-mcp-proxy --databricks-host https://your-workspace.cloud.databricks.com --databricks-app-url http://localhost:8000"
 ```
 
 ## Customization Guide
@@ -255,7 +255,7 @@ echo "Use the check_system prompt from databricks-mcp" | claude
 - **Tool errors**: Check logs at `https://your-app.databricksapps.com/logz`
 - **MCP connection issues**: 
   - Check Claude logs: `tail -f ~/Library/Logs/Claude/*.log`
-  - Verify the proxy works: `sh -c 'uvx --from git+ssh://... dba-mcp-proxy --help'`
+  - Verify the proxy works: `uvx --from git+ssh://... dba-mcp-proxy --help`
   - Test with echo pipe: `echo "list your mcp commands" | claude`
 - **Cached version issues**: If you get errors about missing arguments after an update:
   ```bash
