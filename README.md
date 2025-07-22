@@ -43,6 +43,19 @@ Think of it as a bridge between Claude and your Databricks workspace - you defin
    - Translates between Claude's stdio protocol and HTTP/SSE
    - Works with both local development and deployed apps
 
+## 🎬 Demo
+
+Watch how to set up and use a Databricks MCP server with Claude in this walkthrough:
+
+[![Databricks MCP Demo](https://github.com/user-attachments/assets/315a0e35-73c0-47f7-9ce5-dfada3149101)](https://www.youtube.com/watch?v=oKE59zgb6e0)
+
+**Video highlights:**
+- Setting up your Databricks MCP server from this template
+- Deploying to Databricks Apps
+- Adding the MCP server to Claude CLI
+- Using MCP prompts and tools in Claude
+- Creating custom prompts and tools
+
 ## Quick Start
 
 ### Create Your Own MCP Server
