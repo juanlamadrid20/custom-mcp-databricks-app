@@ -257,6 +257,13 @@ echo "Use the check_system prompt from databricks-mcp" | claude
   - Check Claude logs: `tail -f ~/Library/Logs/Claude/*.log`
   - Verify the proxy works: `uvx --from git+ssh://... dba-mcp-proxy --help`
   - Test with echo pipe: `echo "list your mcp commands" | claude`
+- **Cached version issues**: If you get errors about missing arguments after an update:
+  ```bash
+  # Clear uvx cache for this package
+  rm -rf ~/.cache/uv/git-v0/checkouts/*/
+  # Or clear entire uv cache
+  uv cache clean
+  ```
 
 ## Contributing
 
