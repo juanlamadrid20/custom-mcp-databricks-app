@@ -221,7 +221,8 @@ class MCPProxy:
       print(json.dumps(error_response), flush=True)
 
 
-if __name__ == '__main__':
+def main():
+  """Main entry point for the MCP proxy."""
   try:
     # Get URL from command line argument
     if len(sys.argv) < 2:
@@ -239,3 +240,7 @@ if __name__ == '__main__':
   except Exception as e:
     print(f'Error: {e}', file=sys.stderr)
     sys.exit(1)
+
+
+if __name__ == '__main__':
+  main()
