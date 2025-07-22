@@ -61,6 +61,13 @@ claude mcp add databricks-mcp --scope user -- \
   --databricks-app-url $DATABRICKS_APP_URL
 ```
 
+> **Note**: You can also use HTTPS instead of SSH if you prefer:
+> ```bash
+> uvx --from https://github.com/databricks-solutions/custom-mcp-databricks-app.git dba-mcp-proxy \
+>   --databricks-host $DATABRICKS_HOST \
+>   --databricks-app-url $DATABRICKS_APP_URL
+> ```
+
 Or for better readability, use the multi-line format:
 
 ```bash
