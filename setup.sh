@@ -326,6 +326,29 @@ if [ "$skip_env" != "true" ]; then
     update_env_value "DATABRICKS_APP_NAME" "$DATABRICKS_APP_NAME" "Databricks App Configuration"
     update_env_value "DBA_SOURCE_CODE_PATH" "$DBA_SOURCE_CODE_PATH"
     
+    # MCP Server Configuration
+    echo ""
+    echo "🔧 MCP Server Configuration"
+    echo "---------------------------"
+    
+    # Load current servername from config.yaml if it exists
+    CURRENT_SERVERNAME=""
+    if [ -f "config.yaml" ]; then
+        CURRENT_SERVERNAME=$(grep "servername:" config.yaml 2>/dev/null | cut -d':' -f2 | sed 's/^ *//' | sed 's/ *$//')
+    fi
+    
+    if [ -z "$CURRENT_SERVERNAME" ]; then
+        CURRENT_SERVERNAME="databricks-mcp"
+    fi
+    
+    prompt_with_default "MCP Server Name" "$CURRENT_SERVERNAME" "SERVERNAME"
+    
+    # Create or update config.yaml
+    echo "# MCP Server Configuration" > config.yaml
+    echo "servername: $SERVERNAME" >> config.yaml
+    
+    echo "✅ MCP server configuration saved to config.yaml"
+    
     echo ""
     echo "✅ Environment configuration saved to .env.local"
 fi

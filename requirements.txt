@@ -18,3 +18,4 @@ debugpy>=1.8.15
 fastapi-mcp>=0.3.7
 fastmcp
 mcp>=1.12.0
+pyyaml>=6.0.2

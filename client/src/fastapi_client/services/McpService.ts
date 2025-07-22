@@ -29,7 +29,7 @@ export class McpService {
      * from the FastMCP server instance.
      *
      * Returns:
-     * Dictionary with prompts and tools lists
+     * Dictionary with prompts and tools lists and servername
      * @returns any Successful Response
      * @throws ApiError
      */
@@ -37,6 +37,21 @@ export class McpService {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/mcp_info/discovery',
+        });
+    }
+    /**
+     * Get Mcp Config
+     * Get MCP configuration for Claude Code setup.
+     *
+     * Returns:
+     * Dictionary with configuration needed for Claude MCP setup
+     * @returns any Successful Response
+     * @throws ApiError
+     */
+    public static getMcpConfigApiMcpInfoConfigGet(): CancelablePromise<Record<string, any>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/mcp_info/config',
         });
     }
 }

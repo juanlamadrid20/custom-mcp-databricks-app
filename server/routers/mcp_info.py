@@ -48,9 +48,9 @@ async def get_mcp_discovery() -> Dict[str, Any]:
   from the FastMCP server instance.
 
   Returns:
-      Dictionary with prompts and tools lists
+      Dictionary with prompts and tools lists and servername
   """
-  from server.app import mcp_server as mcp
+  from server.app import mcp_server as mcp, servername
 
   prompts_list = []
   tools_list = []
@@ -74,4 +74,29 @@ async def get_mcp_discovery() -> Dict[str, Any]:
       for tool in tools
     ]
 
-  return {'prompts': prompts_list, 'tools': tools_list}
+  return {'prompts': prompts_list, 'tools': tools_list, 'servername': servername}
+
+
+@router.get('/config')
+async def get_mcp_config() -> Dict[str, Any]:
+  """Get MCP configuration for Claude Code setup.
+  
+  Returns:
+      Dictionary with configuration needed for Claude MCP setup
+  """
+  from server.app import servername
+  
+  # Get environment variables
+  databricks_host = os.environ.get('DATABRICKS_HOST', '')
+  is_databricks_app = os.environ.get('DATABRICKS_APP_PORT') is not None
+  
+  # Get the base directory for client path
+  base_dir = Path(__file__).parent.parent.parent
+  client_path = str(base_dir / 'mcp_databricks_client.py')
+  
+  return {
+    'servername': servername,
+    'databricks_host': databricks_host,
+    'is_databricks_app': is_databricks_app,
+    'client_path': client_path
+  }

@@ -56,8 +56,8 @@ export DATABRICKS_APP_URL="https://your-app.databricksapps.com"  # Get this from
 
 # Add this MCP server to Claude (user-scoped)
 claude mcp add databricks-mcp --scope user -- \
-  uvx --from git+ssh://git@github.com/databricks-solutions/custom-mcp-databricks-app.git \
-  dba-mcp-proxy --databricks-host $DATABRICKS_HOST \
+  uvx --from git+ssh://git@github.com/databricks-solutions/custom-mcp-databricks-app.git dba-mcp-proxy \
+  --databricks-host $DATABRICKS_HOST \
   --databricks-app-url $DATABRICKS_APP_URL
 ```
 
@@ -68,11 +68,14 @@ Or for better readability, use the multi-line format:
 export DATABRICKS_HOST="https://your-workspace.cloud.databricks.com"
 export DATABRICKS_APP_URL="https://your-app.databricksapps.com"  # Get this from ./app_status.sh
 
+# Read configuration from config.yaml  
+export SERVERNAME=$(yq '.servername' config.yaml)
+
 # Add with full paths (recommended for clarity)
-claude mcp add databricks-mcp --scope user -- \
+claude mcp add $MCP_SERVERNAME --scope user -- \
   /opt/homebrew/bin/uvx \
   --from git+ssh://git@github.com/databricks-solutions/custom-mcp-databricks-app.git \
-  dba-mcp-proxy \
+  $MCP_PROXY_COMMAND \
   --databricks-host $DATABRICKS_HOST \
   --databricks-app-url $DATABRICKS_APP_URL
 ```
@@ -91,8 +94,8 @@ export DATABRICKS_APP_URL="https://your-app.databricksapps.com"  # Get this from
 
 # Using your fork
 claude mcp add my-databricks-mcp --scope user -- \
-  uvx --from git+ssh://git@github.com/YOUR-ORG/YOUR-REPO.git \
-  dba-mcp-proxy --databricks-host $DATABRICKS_HOST \
+  uvx --from git+ssh://git@github.com/YOUR-ORG/YOUR-REPO.git dba-mcp-proxy \
+  --databricks-host $DATABRICKS_HOST \
   --databricks-app-url $DATABRICKS_APP_URL
 ```
 
@@ -113,8 +116,8 @@ export DATABRICKS_APP_URL="http://localhost:8000"  # Local dev server
 
 # Add to Claude for local testing
 claude mcp add databricks-mcp-local --scope local -- \
-  uvx --from git+ssh://git@github.com/YOUR-ORG/YOUR-REPO.git \
-  dba-mcp-proxy --databricks-host $DATABRICKS_HOST \
+  uvx --from git+ssh://git@github.com/YOUR-ORG/YOUR-REPO.git dba-mcp-proxy \
+  --databricks-host $DATABRICKS_HOST \
   --databricks-app-url $DATABRICKS_APP_URL
 ```
 
