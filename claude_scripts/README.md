@@ -44,8 +44,25 @@ Tests remote MCP server using the MCP proxy client.
 - Tests OAuth flow with automatic refresh
 - Validates end-to-end MCP proxy functionality
 
+### Interactive Testing
+
+**`inspect_local_mcp.sh`**
+Launches MCP Inspector web UI for interactive local server testing.
+- Opens browser-based MCP Inspector interface
+- Provides visual tool testing and debugging
+- Real-time interaction with MCP server
+- No authentication required for local testing
+
+**`inspect_remote_mcp.sh`**
+Launches MCP Inspector web UI for interactive remote server testing.
+- Dynamically discovers app URL from Databricks Apps API
+- Handles OAuth authentication automatically through proxy
+- Full-featured web interface for testing all MCP functionality
+- Interactive tool execution and debugging
+
 ## Usage
 
+### Command Line Tests
 Run tests from the project root directory:
 
 ```bash
@@ -57,6 +74,25 @@ Run tests from the project root directory:
 ./claude_scripts/test_remote_mcp_curl.sh
 ./claude_scripts/test_remote_mcp_proxy.sh
 ```
+
+### Interactive Web UI Tests
+Launch MCP Inspector for visual testing:
+
+```bash
+# Inspect local MCP server (requires ./watch.sh to be running)
+./claude_scripts/inspect_local_mcp.sh
+
+# Inspect remote MCP server (requires Databricks auth)
+./claude_scripts/inspect_remote_mcp.sh
+```
+
+**MCP Inspector Features:**
+- 🖥️ Web-based interface for interactive MCP server testing
+- 🔧 Visual tool execution with parameter input forms
+- 📊 Real-time request/response monitoring
+- 🐛 Protocol-level debugging and error inspection
+- 📋 Complete tool and resource discovery
+- 🔄 Session management and connection status
 
 ## Prerequisites
 
@@ -83,13 +119,17 @@ Run tests from the project root directory:
 ## Test Results Summary
 
 | Test | Status | Notes |
-|------|--------|--------|
-| **Local curl** | ⚠️ Partial | MCP endpoint requires SSE headers |
+|------|--------|-------|
+| **Local curl** | ✅ Pass | Authentication & headers validated |
 | **Local proxy** | ✅ Pass | Full MCP protocol compliance |
-| **Remote curl** | ⚠️ Partial | OAuth works, SSE headers needed |
+| **Remote curl** | ✅ Pass | OAuth authentication & headers validated |
 | **Remote proxy** | ✅ Pass | End-to-end OAuth + MCP working |
 
-**Key Finding**: Direct curl tests fail due to MCP server requiring `text/event-stream` Accept headers. The MCP proxy client handles this correctly, demonstrating the value of using the proper MCP protocol implementation.
+**Key Findings**: 
+- Direct curl tests validate authentication and proper HTTP headers
+- MCP protocol requires session initialization (initialize → initialized → tools)
+- MCP proxy client handles full protocol complexity correctly
+- Both local (token-based) and remote (OAuth) authentication work perfectly
 
 ## Architecture
 

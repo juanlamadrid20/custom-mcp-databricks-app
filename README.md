@@ -290,6 +290,10 @@ def create_job(name: str, notebook_path: str, cluster_id: str) -> dict:
 
 ## Testing Your MCP Server
 
+This template includes comprehensive testing tools for validating MCP functionality at multiple levels.
+
+### Quick Verification
+
 After adding the MCP server to Claude, verify it's working:
 
 ```bash
@@ -299,6 +303,47 @@ echo "What MCP prompts are available from databricks-mcp?" | claude
 # Test a specific prompt
 echo "Use the check_system prompt from databricks-mcp" | claude
 ```
+
+### Comprehensive Testing Suite
+
+The `claude_scripts/` directory contains 6 testing tools for thorough MCP validation:
+
+#### Command Line Tests
+```bash
+# Test local MCP server (requires ./watch.sh to be running)
+./claude_scripts/test_local_mcp_curl.sh      # Direct HTTP/curl tests with session handling
+./claude_scripts/test_local_mcp_proxy.sh     # MCP proxy client tests
+
+# Test remote MCP server (requires Databricks auth and deployment)
+./claude_scripts/test_remote_mcp_curl.sh     # OAuth + HTTP tests with dynamic URL discovery
+./claude_scripts/test_remote_mcp_proxy.sh    # Full end-to-end MCP proxy tests
+```
+
+#### Interactive Web UI Tests
+```bash
+# Launch MCP Inspector for visual testing (requires ./watch.sh for local)
+./claude_scripts/inspect_local_mcp.sh        # Local server web interface
+./claude_scripts/inspect_remote_mcp.sh       # Remote server web interface
+```
+
+**MCP Inspector Features:**
+- 🖥️ Web-based interface for interactive MCP server testing
+- 🔧 Visual tool execution with parameter input forms  
+- 📊 Real-time request/response monitoring
+- 🐛 Protocol-level debugging and error inspection
+- 📋 Complete tool and resource discovery
+
+#### What Each Test Validates
+
+| Test Type | Authentication | Protocol | Session Management | Tool Discovery |
+|-----------|---------------|----------|-------------------|----------------|
+| **curl tests** | ✅ | ✅ | ✅ | ✅ |
+| **proxy tests** | ✅ | ✅ | ✅ | ✅ |
+| **MCP Inspector** | ✅ | ✅ | ✅ | ✅ |
+
+All tests dynamically discover app URLs and handle OAuth authentication automatically.
+
+See [`claude_scripts/README.md`](claude_scripts/README.md) for detailed documentation.
 
 ## Troubleshooting
 

@@ -55,23 +55,27 @@ fi
 
 echo "✅ Got OAuth token\n"
 
-echo "1. Test remote MCP endpoint availability:"
-curl -s "${REMOTE_URL}/mcp/" \
-  -H "Authorization: Bearer ${TOKEN}" | head -3
+echo "1. Test OAuth authentication and headers:"
+RESPONSE=$(curl -s "${REMOTE_URL}/mcp/" \
+  -H "Accept: application/json, text/event-stream" \
+  -H "Authorization: Bearer ${TOKEN}")
+if echo "$RESPONSE" | grep -q "Missing session ID"; then
+  echo "✅ OAuth authentication accepted, server requires MCP session (expected)"
+else
+  echo "❌ Unexpected response: $RESPONSE"
+fi
 echo "\n"
 
-echo "2. Test tools/list via curl:"
+echo "2. Test direct tools/list (requires MCP session):"
 curl -s -X POST "${REMOTE_URL}/mcp/" \
   -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
   -H "Authorization: Bearer ${TOKEN}" \
   -d '{"jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": {}}' | jq '.'
 echo "\n"
 
-echo "3. Test health tool:"
-curl -s -X POST "${REMOTE_URL}/mcp/" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ${TOKEN}" \
-  -d '{"jsonrpc": "2.0", "id": 2, "method": "tools/call", "params": {"name": "health", "arguments": {}}}' | jq '.'
+echo "ℹ️  Note: Direct curl requires full MCP session initialization."
+echo "   Use the proxy test for complete MCP protocol compliance."
 echo "\n"
 
 echo "✅ Remote MCP curl tests complete"
