@@ -21,19 +21,62 @@ import sys
 import requests
 
 
-def get_oauth_token(databricks_host):
-  """Get OAuth token from Databricks CLI."""
+def validate_token(token, databricks_host):
+  """Validate if a specific token is still valid."""
   try:
-    # Get token directly from Databricks CLI
+    # Use a lightweight endpoint that just checks auth
+    response = requests.get(
+      f'{databricks_host}/api/2.0/preview/scim/v2/Me',
+      headers={'Authorization': f'Bearer {token}'},
+      timeout=5,
+    )
+    return response.status_code == 200
+  except Exception:
+    return False
+
+
+def get_oauth_token(databricks_host):
+  """Get OAuth token from Databricks CLI, handling expired tokens automatically."""
+  try:
+    # First try to get token directly from Databricks CLI
     result = subprocess.run(
-      ['databricks', 'auth', 'token', '--host', databricks_host],
+      ['uvx', 'databricks', 'auth', 'token', '--host', databricks_host],
       capture_output=True,
       text=True,
       check=True,
     )
-    return json.loads(result.stdout).get('access_token')
-  except Exception as e:
-    raise Exception(f'Failed to get OAuth token: {e}')
+    token = json.loads(result.stdout).get('access_token')
+    if token:
+      return token
+    else:
+      raise Exception('No access token in response')
+  except Exception:
+    # Token might be expired or not exist, try OAuth login which handles token generation
+    print(f'Getting fresh OAuth token for {databricks_host}...', file=sys.stderr)
+    try:
+      # OAuth login should handle token generation automatically
+      subprocess.run(
+        ['uvx', 'databricks', 'auth', 'login', '--host', databricks_host],
+        capture_output=True,
+        text=True,
+        check=True,
+      )
+
+      # Get the token that was generated during login
+      result = subprocess.run(
+        ['uvx', 'databricks', 'auth', 'token', '--host', databricks_host],
+        capture_output=True,
+        text=True,
+        check=True,
+      )
+      token = json.loads(result.stdout).get('access_token')
+      if token:
+        print('OAuth authentication successful', file=sys.stderr)
+        return token
+      else:
+        raise Exception('No access token after login')
+    except Exception as login_error:
+      raise Exception(f'Failed to authenticate: {login_error}')
 
 
 class MCPProxy:
@@ -58,6 +101,7 @@ class MCPProxy:
     self.initialized = False
     self.session = requests.Session()
     self.is_local = self.app_url.startswith('http://localhost')
+    self._oauth_token = None  # Cache the OAuth token
 
   def _initialize_session(self):
     """Initialize MCP session with proper handshake."""
@@ -66,9 +110,12 @@ class MCPProxy:
 
     # Get appropriate token based on environment
     if self.is_local:
-      oauth_token = 'local-test-token'
+      self._oauth_token = 'local-test-token'
     else:
-      oauth_token = get_oauth_token(self.databricks_host)
+      # Check if we have a valid cached token
+      if not self._oauth_token or not validate_token(self._oauth_token, self.databricks_host):
+        self._oauth_token = get_oauth_token(self.databricks_host)
+    oauth_token = self._oauth_token
 
     headers = {
       'Authorization': f'Bearer {oauth_token}',
@@ -109,11 +156,8 @@ class MCPProxy:
       # Initialize session if needed
       self._initialize_session()
 
-      # Get appropriate token based on environment
-      if self.is_local:
-        oauth_token = 'local-test-token'
-      else:
-        oauth_token = get_oauth_token(self.databricks_host)
+      # Use cached token
+      oauth_token = self._oauth_token
 
       headers = {
         'Authorization': f'Bearer {oauth_token}',
