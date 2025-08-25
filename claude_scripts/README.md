@@ -102,7 +102,8 @@ Launch MCP Inspector for visual testing:
 
 ### For Remote Testing  
 - Databricks CLI installed and configured: `databricks auth login --host <your-workspace>`
-  - Install CLI if needed: `pip install databricks-cli` or `curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh`
+  - Install CLI if needed (with user permission): `curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh`
+  - Requires version 0.260.0+
 - App deployed with `./deploy.sh`
 - Valid `.env.local` configuration with `DATABRICKS_HOST`, `DATABRICKS_TOKEN`, and `DATABRICKS_APP_NAME`
 
