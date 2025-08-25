@@ -177,7 +177,7 @@ export function PromptsPage() {
 
     // Use the correct uvx command from the README with actual values
     return `claude mcp add ${mcpConfig.servername} --scope user -- \\
-  uvx --from git+ssh://git@github.com/databricks-solutions/custom-mcp-databricks-app.git dba-mcp-proxy \\
+  uvx --refresh --from git+ssh://git@github.com/databricks-solutions/custom-mcp-databricks-app.git dba-mcp-proxy \\
   --databricks-host ${databricksHost} \\
   --databricks-app-url ${databricksAppUrl}`;
   };

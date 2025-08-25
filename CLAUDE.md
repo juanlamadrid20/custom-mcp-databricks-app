@@ -320,4 +320,77 @@ If the MCP server doesn't respond:
 3. Verify the proxy command works standalone
 4. Ensure the app is deployed and accessible
 
+### Writing Effective MCP Prompts
+
+**IMPORTANT: MCP prompts should be detailed and actionable, not short and vague.**
+
+MCP prompts are stored in the `prompts/` directory as Markdown files. When Claude receives these prompts, they should provide clear, specific instructions about what to do immediately.
+
+#### Best Practices for MCP Prompts:
+
+1. **Be Explicit and Detailed**: Instead of "List files", write detailed instructions like:
+   ```markdown
+   # Directory Contents Analysis
+   
+   **IMMEDIATE ACTION REQUIRED:** Execute the ls command right now to display all files and directories.
+   
+   You must run this exact command immediately:
+   ```bash
+   ls -la
+   ```
+   
+   **What this command does:**
+   - `ls` lists directory contents
+   - `-l` shows detailed information (permissions, size, date modified)
+   - `-a` shows ALL files including hidden files
+   ```
+
+2. **Use Action-Oriented Language**: 
+   - ✅ "Execute this command now"
+   - ✅ "Run the following immediately"
+   - ✅ "You must perform this action"
+   - ❌ "You can list files"
+   - ❌ "Consider running ls"
+
+3. **Provide Context and Explanation**: Include:
+   - What the command/action does
+   - Why it's important
+   - What output to expect
+   - How to interpret results
+
+4. **Specify Exact Commands**: Always provide the complete, copy-pasteable command rather than general instructions.
+
+5. **Use Clear Structure**: 
+   - Start with clear action requirement
+   - Provide exact command in code block
+   - Explain what it does
+   - Explain why it matters
+
+#### Example Transformation:
+
+**Bad (vague):**
+```markdown
+Use ping to test connectivity
+```
+
+**Good (detailed and actionable):**
+```markdown
+# Test Network Connectivity
+
+**IMMEDIATE ACTION REQUIRED:** Run the ping command right now to test network connectivity to Google.
+
+You must execute this exact command immediately:
+```bash
+ping -c 4 google.com
+```
+
+**What this does:**
+- Tests if your system can reach google.com
+- Sends 4 ping packets (-c 4 flag limits to 4 pings)
+- Shows response times and packet loss statistics
+- Confirms internet connectivity and DNS resolution
+
+**Execute the ping command now using the Bash tool.**
+```
+
 Remember: This is a development template focused on rapid iteration and modern tooling.

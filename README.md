@@ -107,7 +107,7 @@ export SERVER_NAME="your-server-name"  # This comes from config.yaml (set during
 
 # Add your MCP server to Claude (user-scoped)
 claude mcp add $SERVER_NAME --scope user -- \
-  uvx --from git+ssh://git@github.com/YOUR-USERNAME/your-repo.git dba-mcp-proxy \
+  uvx --refresh --from git+ssh://git@github.com/YOUR-USERNAME/your-repo.git dba-mcp-proxy \
   --databricks-host $DATABRICKS_HOST \
   --databricks-app-url $DATABRICKS_APP_URL
 ```
@@ -129,7 +129,7 @@ export DATABRICKS_APP_URL="http://localhost:8000"  # Local dev server
 
 # Add to Claude for local testing
 claude mcp add databricks-mcp-local --scope local -- \
-  uvx --from git+ssh://git@github.com/YOUR-ORG/YOUR-REPO.git dba-mcp-proxy \
+  uvx --refresh --from git+ssh://git@github.com/YOUR-ORG/YOUR-REPO.git dba-mcp-proxy \
   --databricks-host $DATABRICKS_HOST \
   --databricks-app-url $DATABRICKS_APP_URL
 ```
@@ -352,7 +352,7 @@ See [`claude_scripts/README.md`](claude_scripts/README.md) for detailed document
 - **Tool errors**: Check logs at `https://your-app.databricksapps.com/logz`
 - **MCP connection issues**: 
   - Check Claude logs: `tail -f ~/Library/Logs/Claude/*.log`
-  - Verify the proxy works: `uvx --from git+ssh://... dba-mcp-proxy --help`
+  - Verify the proxy works: `uvx --refresh --from git+ssh://... dba-mcp-proxy --help`
   - Test with echo pipe: `echo "list your mcp commands" | claude`
 - **Cached version issues**: If you get errors about missing arguments after an update:
   ```bash
