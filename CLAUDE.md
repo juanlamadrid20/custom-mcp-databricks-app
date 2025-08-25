@@ -427,4 +427,270 @@ ping -c 4 google.com
 **Execute the ping command now using the Bash tool.**
 ```
 
+### Databricks App Testing and Debugging
+
+The project includes two powerful clients for testing and debugging deployed Databricks apps:
+
+#### HTTP API Client (dba_client.py)
+
+Test your deployed app's API endpoints with authenticated requests:
+
+```bash
+# Test user authentication and get user info
+uv run python dba_client.py https://your-app.aws.databricksapps.com /api/user/me
+
+# Get MCP server information
+uv run python dba_client.py https://your-app.aws.databricksapps.com /api/mcp_info/info
+
+# Test MCP discovery endpoint
+uv run python dba_client.py https://your-app.aws.databricksapps.com /api/mcp_info/discovery
+
+# Make POST requests with JSON data
+uv run python dba_client.py https://your-app.aws.databricksapps.com /api/data POST '{"key":"value"}'
+
+# Test any custom endpoint
+uv run python dba_client.py https://your-app.aws.databricksapps.com /api/custom/endpoint
+```
+
+**Features:**
+- Automatic Databricks CLI OAuth authentication
+- Supports GET, POST, PUT, DELETE methods
+- Token caching and validation
+- Uses environment variables from `.env.local`
+- Detailed debug output showing token usage
+
+#### WebSocket Log Streaming Client (dba_logz.py)
+
+Stream live logs from your deployed Databricks app for real-time debugging:
+
+```bash
+# Stream all logs for 30 seconds (default)
+uv run python dba_logz.py https://your-app.aws.databricksapps.com
+
+# Stream logs for a specific duration
+uv run python dba_logz.py https://your-app.aws.databricksapps.com --duration 10
+
+# Filter logs with search query
+uv run python dba_logz.py https://your-app.aws.databricksapps.com --search "ERROR" --duration 60
+
+# Search for specific API calls
+uv run python dba_logz.py https://your-app.aws.databricksapps.com --search "/api/mcp" --duration 30
+
+# Monitor startup logs
+uv run python dba_logz.py https://your-app.aws.databricksapps.com --search "FastAPI" --duration 15
+```
+
+**Features:**
+- Real-time WebSocket connection to `/logz/stream`
+- Optional search filtering with regex support
+- Configurable streaming duration
+- Automatic OAuth authentication
+- Structured JSON log output with timestamps
+
+#### Authentication Setup
+
+Both clients use your existing Databricks CLI authentication:
+
+```bash
+# Ensure you're authenticated (both clients will check this automatically)
+source .env.local && export DATABRICKS_HOST && export DATABRICKS_TOKEN && databricks current-user me
+```
+
+The clients automatically:
+- Load environment variables from `.env.local`
+- Use your Databricks CLI profile or host configuration
+- Handle token refresh if needed
+- Provide detailed authentication debug output
+
+#### Debugging Workflow
+
+1. **Test basic connectivity:**
+   ```bash
+   uv run python dba_client.py https://your-app.aws.databricksapps.com /api/user/me
+   ```
+
+2. **Verify MCP functionality:**
+   ```bash
+   uv run python dba_client.py https://your-app.aws.databricksapps.com /api/mcp_info/info
+   ```
+
+3. **Monitor live logs during testing:**
+   ```bash
+   uv run python dba_logz.py https://your-app.aws.databricksapps.com --duration 60 &
+   # In another terminal, test your app
+   uv run python dba_client.py https://your-app.aws.databricksapps.com /api/some/endpoint
+   ```
+
+4. **Debug specific issues:**
+   ```bash
+   # Search for errors
+   uv run python dba_logz.py https://your-app.aws.databricksapps.com --search "ERROR|Failed|Exception"
+   
+   # Monitor specific endpoints
+   uv run python dba_logz.py https://your-app.aws.databricksapps.com --search "/api/mcp_info"
+   ```
+
+## MCP Debugging and Troubleshooting
+
+### 🚨 CRITICAL: MCP Connection Debugging
+
+**When MCP integration isn't working, use this systematic debugging approach:**
+
+#### Step 1: Test Before Adding to Claude CLI
+
+**CRITICAL: Always test your MCP connection locally before running `claude mcp add`**
+
+```bash
+# Go to the MCP proxy directory  
+cd dba_mcp_proxy
+
+# Test MCP connection and discover what tools are available
+echo '{"jsonrpc": "2.0", "id": "test", "method": "tools/list"}' | python mcp_client.py --databricks-host YOUR_DATABRICKS_HOST --databricks-app-url YOUR_APP_URL
+```
+
+**This should return a JSON response with available tools. Take note of the tool names.**
+
+#### Step 2: Test Any Available Tool
+
+**Pick any tool from the list and test it:**
+
+```bash
+# Generic pattern - replace TOOL_NAME with any tool from your list
+echo '{"jsonrpc": "2.0", "id": "test", "method": "tools/call", "params": {"name": "TOOL_NAME", "arguments": {}}}' | python mcp_client.py --databricks-host YOUR_DATABRICKS_HOST --databricks-app-url YOUR_APP_URL
+
+# Example with a common tool (if it exists in your setup)
+echo '{"jsonrpc": "2.0", "id": "test", "method": "tools/call", "params": {"name": "health", "arguments": {}}}' | python mcp_client.py --databricks-host YOUR_DATABRICKS_HOST --databricks-app-url YOUR_APP_URL
+```
+
+#### Step 3: Log Verification Workflow
+
+**CRITICAL: Verify requests are reaching your app by monitoring logs simultaneously:**
+
+1. **Start log monitoring in one terminal:**
+   ```bash
+   # Monitor for MCP requests specifically
+   uv run python dba_logz.py YOUR_APP_URL --search "/mcp" --duration 60
+   ```
+
+2. **In another terminal, make any MCP request:**
+   ```bash
+   cd dba_mcp_proxy
+   echo '{"jsonrpc": "2.0", "id": "test", "method": "tools/call", "params": {"name": "TOOL_NAME", "arguments": {}}}' | python mcp_client.py --databricks-host YOUR_DATABRICKS_HOST --databricks-app-url YOUR_APP_URL
+   ```
+
+3. **Verify log output shows the request:**
+   ```
+   📋 {"source":"APP","timestamp":1756142xxx,"message":"INFO: 127.0.0.1:xxxxx - \"POST /mcp/ HTTP/1.1\" 200 OK"}
+   ```
+
+**If you see the `/mcp` POST request at the same time you sent it, then you know you're in good shape!**
+
+#### Step 4: Only After Local Testing Works - Add to Claude CLI
+
+**Once Steps 1-3 work locally, then add to Claude CLI:**
+
+```bash
+# Get your app URL
+export DATABRICKS_APP_URL=$(./app_status.sh | grep "App URL" | awk '{print $NF}')
+
+# Add to Claude CLI (this runs the same uvx command you just tested)
+claude mcp add YOUR_SERVER_NAME --scope user -- \
+  uvx --refresh --from git+ssh://git@github.com/databricks-solutions/custom-mcp-databricks-app.git dba-mcp-proxy \
+  --databricks-host $DATABRICKS_HOST \
+  --databricks-app-url $DATABRICKS_APP_URL
+```
+
+**The key insight: The `claude mcp add` command runs the exact same `uvx --refresh --from...` command you can test locally first.**
+
+### Common Issues and Solutions
+
+#### Issue 1: "Connection refused" or timeout errors
+
+**Diagnosis:**
+```bash
+# Test basic connectivity
+uv run python dba_client.py https://your-app.aws.databricksapps.com /api/user/me
+```
+
+**Solutions:**
+- Verify app is deployed and running: `./app_status.sh`
+- Check if app URL is correct in your command
+- Ensure you're authenticated: `databricks current-user me`
+
+#### Issue 2: "401 Unauthorized" errors
+
+**Diagnosis:**
+```bash
+# Check authentication
+source .env.local && export DATABRICKS_HOST && export DATABRICKS_TOKEN && databricks current-user me
+```
+
+**Solutions:**
+- Re-authenticate: `databricks auth login --host $DATABRICKS_HOST`
+- Verify environment variables in `.env.local`
+- Check if your token has expired
+
+#### Issue 3: MCP tools not found
+
+**Diagnosis:**
+```bash
+# Test MCP endpoint directly
+uv run python dba_client.py https://your-app.aws.databricksapps.com /api/mcp_info/discovery
+```
+
+**Solutions:**
+- Redeploy the app: `./deploy.sh`
+- Check app logs for startup errors: `uv run python dba_logz.py https://your-app.aws.databricksapps.com --search "ERROR|FastAPI" --duration 30`
+- Verify MCP server is running on the app
+
+#### Issue 4: SQL queries failing
+
+**Symptoms:** `"No SQL warehouse ID provided"` or warehouse errors
+
+**Diagnosis:**
+```bash
+# Check available warehouses
+echo '{"jsonrpc": "2.0", "id": "test", "method": "tools/call", "params": {"name": "list_warehouses", "arguments": {}}}' | python mcp_client.py --databricks-host YOUR_DATABRICKS_HOST --databricks-app-url YOUR_APP_URL
+```
+
+**Solutions:**
+- Ensure you have at least one SQL warehouse running
+- Set `DATABRICKS_SQL_WAREHOUSE_ID` in your app's environment
+- Start a warehouse in the Databricks workspace UI
+
+### Debug Command Reference
+
+**Quick debugging commands:**
+
+```bash
+# Test MCP proxy connection
+cd dba_mcp_proxy && echo '{"jsonrpc": "2.0", "id": "test", "method": "tools/list"}' | python mcp_client.py --databricks-host $DATABRICKS_HOST --databricks-app-url $DATABRICKS_APP_URL
+
+# Test HTTP client
+uv run python dba_client.py $DATABRICKS_APP_URL /api/user/me
+
+# Monitor logs for 30 seconds
+uv run python dba_logz.py $DATABRICKS_APP_URL --duration 30
+
+# Monitor MCP requests specifically
+uv run python dba_logz.py $DATABRICKS_APP_URL --search "/mcp|MCP" --duration 60
+
+# Test app health through MCP
+cd dba_mcp_proxy && echo '{"jsonrpc": "2.0", "id": "test", "method": "tools/call", "params": {"name": "health", "arguments": {}}}' | python mcp_client.py --databricks-host $DATABRICKS_HOST --databricks-app-url $DATABRICKS_APP_URL
+```
+
+**Environment setup for debugging:**
+```bash
+# Load environment and test
+source .env.local
+export DATABRICKS_HOST
+export DATABRICKS_TOKEN
+export DATABRICKS_APP_URL=$(./app_status.sh | grep "App URL" | awk '{print $NF}')
+
+# Verify all variables are set
+echo "Host: $DATABRICKS_HOST"
+echo "App URL: $DATABRICKS_APP_URL"
+databricks current-user me
+```
+
 Remember: This is a development template focused on rapid iteration and modern tooling.

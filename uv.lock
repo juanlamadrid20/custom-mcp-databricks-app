@@ -455,6 +455,7 @@ dependencies = [
     { name = "requests" },
     { name = "rich" },
     { name = "uvicorn", extra = ["standard"] },
+    { name = "websockets" },
 ]
 
 [package.optional-dependencies]
@@ -498,6 +499,7 @@ requires-dist = [
     { name = "ty", marker = "extra == 'dev'", specifier = ">=0.0.1a14" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.24.0" },
     { name = "watchdog", marker = "extra == 'dev'", specifier = ">=3.0.0" },
+    { name = "websockets", specifier = ">=15.0.1" },
 ]
 provides-extras = ["dev"]
 
