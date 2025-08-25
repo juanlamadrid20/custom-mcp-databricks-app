@@ -30,7 +30,7 @@ echo "Getting app URL from Databricks Apps API..."
 # Get the app URL dynamically using the Databricks CLI with environment variables
 export DATABRICKS_HOST
 export DATABRICKS_TOKEN
-APP_INFO=$(uvx databricks apps list 2>/dev/null | grep "^${DATABRICKS_APP_NAME}" || true)
+APP_INFO=$(databricks apps list 2>/dev/null | grep "^${DATABRICKS_APP_NAME}" || true)
 
 if [ -z "$APP_INFO" ]; then
   echo "❌ ERROR: App '${DATABRICKS_APP_NAME}' not found in Databricks Apps"
@@ -88,7 +88,7 @@ echo '{"jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": {}}' | \
 
 if [ $? -eq 124 ]; then
   echo "❌ Test timed out - OAuth authentication may have failed"
-  echo "   Please run: uvx databricks auth login --host ${DATABRICKS_HOST}"
+  echo "   Please run: databricks auth login --host ${DATABRICKS_HOST}"
 fi
 
 echo ""

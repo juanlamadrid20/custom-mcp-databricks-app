@@ -69,6 +69,22 @@ python scripts/make_fastapi_client.py
 
 ### 🚨 DATABRICKS CLI EXECUTION RULE 🚨
 
+**IMPORTANT: Databricks CLI Installation Required**
+If you don't have the Databricks CLI installed, install it first. **Requires version 0.260.0 or higher:**
+```bash
+# Check current version (if installed)
+databricks version
+
+# Option 1: Using pip (recommended for latest version)
+pip install databricks-cli
+
+# Option 2: Using the official installer
+curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+
+# Verify version is 0.260.0+
+databricks version
+```
+
 **NEVER run `databricks` CLI directly - ALWAYS prefix with environment setup:**
 
 ```bash
