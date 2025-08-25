@@ -198,6 +198,16 @@ class MCPProxy:
         'error': {'code': -32000, 'message': str(e)},
       }
 
+  def test_connection(self):
+    """Test the connection to the MCP server."""
+    try:
+      self._initialize_session()
+      print(f'✓ Connected to MCP server at: {self.app_url}', file=sys.stderr)
+      return True
+    except Exception as e:
+      print(f'✗ Failed to connect to MCP server at {self.app_url}: {e}', file=sys.stderr)
+      return False
+
   def run(self):
     """Run the MCP proxy server using stdio transport."""
     # Main loop - read from stdin, proxy to remote, write to stdout
@@ -265,7 +275,11 @@ Examples:
 
   try:
     proxy = MCPProxy(args.databricks_host, args.databricks_app_url)
-    print(f'Connected to MCP server at: {proxy.app_url}', file=sys.stderr)
+
+    # Test connection before starting proxy
+    if not proxy.test_connection():
+      sys.exit(1)
+
     proxy.run()
   except Exception as e:
     print(f'Error: {e}', file=sys.stderr)
