@@ -259,6 +259,10 @@ Examples:
 
   args = parser.parse_args()
 
+  # Ensure databricks_host starts with https://
+  if not args.databricks_host.startswith(('http://', 'https://')):
+    args.databricks_host = 'https://' + args.databricks_host
+
   try:
     proxy = MCPProxy(args.databricks_host, args.databricks_app_url)
     print(f'Connected to MCP server at: {proxy.app_url}', file=sys.stderr)
