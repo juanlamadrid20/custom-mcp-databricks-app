@@ -21,6 +21,40 @@ This is a modern full-stack application template for Databricks Apps, featuring 
 
 ## Development Workflow
 
+### 🚨 CRITICAL: UV Installation Required 🚨
+
+**IMPORTANT: This project requires `uv` (Python package manager) to be installed.**
+
+Before proceeding with any development tasks, **ALWAYS check if uv is installed:**
+
+```bash
+# Check if uv is installed
+uv --version
+```
+
+**If uv is not found or command fails:**
+1. **ASK USER PERMISSION** before installing: "uv is required for this project. May I install it for you?"
+2. **Only after user approval**, install using the official installer:
+   ```bash
+   # Install uv (requires user permission)
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   
+   # Restart shell or source the updated PATH
+   source ~/.bashrc  # or ~/.zshrc
+   
+   # Verify installation
+   uv --version
+   ```
+
+**Why uv is required:**
+- All Python dependency management (`uv add/remove`)
+- Virtual environment management
+- Python execution (`uv run python`)
+- Backend server operation
+- Package installation and updates
+
+**Without uv installed, NOTHING in this project will work correctly.**
+
 ### Package Management
 - Use `uv add/remove` for Python dependencies, not manual edits to pyproject.toml
 - Use `bun add/remove` for frontend dependencies, not manual package.json edits
