@@ -1,6 +1,7 @@
 """MCP Tools for Databricks operations."""
 
 import os
+from typing import Optional
 
 from databricks.sdk import WorkspaceClient
 
@@ -24,9 +25,9 @@ def load_tools(mcp_server):
   @mcp_server.tool
   def execute_dbsql(
     query: str,
-    warehouse_id: str = None,
-    catalog: str = None,
-    schema: str = None,
+    warehouse_id: Optional[str] = None,
+    catalog: Optional[str] = None,
+    schema: Optional[str] = None,
     limit: int = 100,
   ) -> dict:
     """Execute a SQL query on Databricks SQL warehouse.
@@ -70,7 +71,13 @@ def load_tools(mcp_server):
       )
 
       # Process results
-      if result.result and result.result.data_array:
+      if (
+        result.result
+        and result.result.data_array
+        and result.manifest
+        and result.manifest.schema
+        and result.manifest.schema.columns
+      ):
         columns = [col.name for col in result.manifest.schema.columns]
         data = []
 
